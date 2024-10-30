@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漢字クイズ</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>    
+    h1 {
+            font-family: 'Kosugi Maru', sans-serif;
+            text-align: center;
+            background-color: rgb(230, 202, 173);
+            padding: 10px;
+        }
+        .select {
+            text-align: center;
+        }
+    html {
+            text-align:center;
+            padding:10px;
+    }
+            .select{
+               
+             text-align:center;
+            }
+    input {
+        padding:0.5%;
+    }
+    button {
+        padding:0.5%;
+        color:#000000;
+        background-color:#ffe0e0
+    }
+    div {
+        font-family:'Kosugi Maru';
+    }
+    button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: transform 0.3s ease;
+}
+button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: transform 0.3s ease;
+        }
+        #question {
+            font-size: 24px;
+            transition: transform 7s linear;
+        }
+
+        /* アニメーション定義 */
+        @keyframes grow {
+            0% {
+                font-size: 24px;
+            }
+            100% {
+                font-size: 48px; /* 最終的なサイズ */
+            }
+        }
+
+        .grow {
+            animation: grow 7s forwards; /* アニメーションを適用 */
+        }
+    </style>
+<body>
+    <h1>漢字クイズ</h1>
+    <!-- 漢字クイズのHTML -->
+<div id="kanjiQuizContainer" style="display: none;">
+    <h2 id="kanjiQuestion"></h2>
+    <input type="text" id="kanjiAnswer" placeholder="答えを入力">
+    <button id="submitKanjiAnswer">解答する</button>
+    <p id="kanjiResult"></p>
+</div>
+
+<div id="kanjiScoreContainer" style="display: none;">
+    <p id="kanjiScore"></p>
+    <button id="restartKanjiQuiz">もう一度挑戦する</button>
+</div>
+
+<button id="startKanjiQuiz">漢字クイズを始める</button>
+<button onclick="location.href='pokesuke.html'">予定に戻る</button>
+    <script src="script.js"></script>
+</body>
+</html>

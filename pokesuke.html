@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <title>ぽけすけ</title>
+  <link rel="icon" href="logo.ico" type="image/x-icon">
+  <img src="logo.jpg" alt="ぽけすけのロゴ" class="logo-img">
+  <script defer src="pokesuke.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: white;
+      background-size: cover;
+    }
+    .logo-img{
+      width: 10%;
+      height: 120px;
+    }
+    #clock {
+      font-size: 3em;
+      margin-top: 20%;
+    }
+    #title {
+      font-size: 2em;
+      margin-top: 10px;
+    }
+    #userNameDisplay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5em;
+    }
+    .menu {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+    .menu ul {
+      list-style-type: none;
+      padding: 0;
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .menu ul li {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      width: 150px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .menu ul li:hover {
+      background-color: #f1f1f1;
+    }
+    .settings-container {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    .settings-container.active {
+      display: block;
+    }
+    .notification {
+      font-size: 1.2em;
+      color: blue;
+      margin-top: 10px;
+    }
+    #scheduleList {
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      text-align: left;
+      font-size: 1.2em;
+      max-width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <div id="title">ぽけすけ</div>
+  <div id="userNameDisplay">Guest</div>
+  <div id="clock"></div>
+
+  
+  <!-- 予定一覧 -->
+  <div id="scheduleList">
+    <h3>予定一覧</h3>
+    <div id="scheduleItems"></div>
+  </div>
+
+  <div class="menu" onclick="toggleMenu()">
+    <img src="https://www.silhouette-illust.com/wp-content/uploads/2016/09/9690-600x600.jpg" width="30" height="30" alt="Settings">
+    <ul id="menuItems">
+      <li onclick="openSettings('schedule')">予定の設定</li>
+      <li onclick="openSettings('user')">ユーザーの設定</li>
+      <li onclick="openBackgroundSettings()">背景設定</li>
+      <li onclick="location.href='https://script.google.com/a/macros/gse.okayama-c.ed.jp/s/AKfycbzSyIPu4X462ZPDWr_9Tykw_zFn9tPU7Gp6pXWJTJreex7qcPnd_gaqZsU9HLO9Ygm3ww/exec'">今日のテスト</li>
+      <li><a href="select.html">覚えよう！</a></li>
+      <li style="color: red;" onclick="logout()">ログアウト</li>
+    </ul>
+  </div>
+
+  <!-- 背景設定のセクション -->
+  <div id="backgroundSettings" class="settings-container">
+    <h2>背景設定</h2>
+    <label>背景色:
+      <select id="backgroundColor" onchange="changeBackgroundColor()">
+        <option value="white">白</option>
+        <option value="black">黒</option>
+        <option value="red">赤</option>
+        <option value="green">緑</option>
+        <option value="blue">青</option>
+        <option value="yellow">黄色</option>
+        <option value="purple">紫</option>
+        <option value="orange">オレンジ</option>
+        <option value="pink">ピンク</option>
+        <option value="gray">灰色</option>
+        <option value="lightblue">水色</option>
+        <option value="lightgreen">薄緑</option>
+        <option value="brown">茶色</option>
+        <option value="beige">ベージュ</option>
+        <option value="cyan">シアン</option>
+        <option value="magenta">マゼンタ</option>
+      </select>
+    </label>
+
+    <label>背景画像URL: <input type="text" id="backgroundImageUrl" onblur="changeBackgroundImage()"></label>
+    <br><br>
+    <button onclick="closeBackgroundSettings()">閉じる</button>
+  </div>
+
+  <!-- 予定設定のセクション -->
+  <div id="scheduleSettings" class="settings-container">
+    <h2>あなたの予定</h2>
+    <div id="scheduleInputs">
+      <label>起床時間: <input type="time" id="wakeupTime"></label><br>
+      <label>メッセージ: <input type="text" id="wakeupMessage"></label><br><br>
+      <label>朝食時間: <input type="time" id="breakfastTime"></label><br>
+      <label>メッセージ: <input type="text" id="breakfastMessage"></label><br><br>
+      <label>出発時間: <input type="time" id="departureTime"></label><br>
+      <label>メッセージ: <input type="text" id="departureMessage"></label><br><br>
+      <label>昼食時間: <input type="time" id="lunchTime"></label><br>
+      <label>メッセージ: <input type="text" id="lunchMessage"></label><br><br>
+      <label>勉強時間: <input type="time" id="studyTime"></label><br>
+      <label>メッセージ: <input type="text" id="studyMessage"></label><br><br>
+      <label>休憩時間: <input type="time" id="breakTime"></label><br>
+      <label>メッセージ: <input type="text" id="breakMessage"></label><br><br>
+      <label>夕食時間: <input type="time" id="dinnerTime"></label><br>
+      <label>メッセージ: <input type="text" id="dinnerMessage"></label><br><br>
+      <label>就寝時間: <input type="time" id="bedTime"></label><br>
+      <label>メッセージ: <input type="text" id="bedMessage"></label><br><br>
+      <button onclick="saveScheduleSettings()">保存</button>
+      <button onclick="closeScheduleSettings()">閉じる</button>
+    </div>
+  </div>
+
+  <!-- ユーザー設定のセクション -->
+  <div id="userSettings" class="settings-container">
+    <h2>ユーザーの設定</h2>
+    <label for="userName">ユーザー名:</label>
+    <input type="text" id="userName" placeholder="ユーザー名"><br>
+    <label for="userEmail">メールアドレス:</label>
+    <input type="email" id="userEmail" placeholder="メールアドレス"><br>
+    <label for="nameColor">名前の色:</label>
+    <input type="color" id="nameColor"><br>
+    <label for="nameFont">名前のフォント:</label>
+    <select id="nameFont">
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="Times New Roman, serif">Times New Roman</option>
+      <option value="Courier New, monospace">Courier New</option>
+    </select><br>
+    <button onclick="saveUserSettings()">設定を保存</button>
+    <button id="closeSettingsBtn">閉じる</button>
+  </div>
+
+
+  <script>
+     function updateTime() {
+      var clockElement = document.getElementById('clock');
+      var japanTimeZone = "Asia/Tokyo";
+      var options = {
+        timeZone: japanTimeZone,
+        hour12: false,
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      };
+      var japanTime = new Date().toLocaleString("ja-JP", options);
+      clockElement.innerText = japanTime;
+
+      // 5分前の通知
+      var currentTime = new Date();
+      var scheduleTime = new Date(currentTime);
+      scheduleTime.setMinutes(currentTime.getMinutes() + 5);
+      var scheduleTimeString = scheduleTime.toLocaleTimeString("ja-JP", {
+        hour12: false,
+        hour: 'numeric',
+        minute: 'numeric'
+      });
+
+      var messages = [
+        { time: document.getElementById('wakeupTime').value, message: document.getElementById('wakeupMessage').value, event: '起床' },
+        { time: document.getElementById('breakfastTime').value, message: document.getElementById('breakfastMessage').value, event: '朝食' },
+        { time: document.getElementById('departureTime').value, message: document.getElementById('departureMessage').value, event: '出発' },
+        { time: document.getElementById('lunchTime').value, message: document.getElementById('lunchMessage').value, event: '昼食' },
+        { time: document.getElementById('studyTime').value, message: document.getElementById('studyMessage').value, event: '勉強' },
+        { time: document.getElementById('breakTime').value, message: document.getElementById('breakMessage').value, event: '休憩' },
+        { time: document.getElementById('dinnerTime').value, message: document.getElementById('dinnerMessage').value, event: '夕食' },
+        { time: document.getElementById('bedTime').value, message: document.getElementById('bedMessage').value, event: '就寝' },
+      ];
+
+      messages.forEach(item => {
+        if (item.time === scheduleTimeString && item.message) {
+          var notificationElement = document.getElementById('clock');
+          var messageElement = document.createElement('div');
+          messageElement.innerText = item.event + ': ' + item.message;
+          messageElement.classList.add('notification');
+          notificationElement.appendChild(messageElement);
+        }
+      });
+    }
+
+    function toggleMenu() {
+      var menu = document.getElementById('menuItems');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function openSettings(type) {
+      if (type === 'schedule') {
+        var scheduleSettings = document.getElementById('scheduleSettings');
+        scheduleSettings.classList.toggle('active');
+      } else if (type === 'user') {
+        var userSettings = document.getElementById('userSettings');
+        userSettings.classList.toggle('active');
+      }
+    }
+
+    function openBackgroundSettings() {
+      var backgroundSettings = document.getElementById('backgroundSettings');
+      backgroundSettings.classList.add('active');
+    }
+
+    function changeBackgroundColor() {
+      var bgColor = document.getElementById('backgroundColor').value;
+      document.body.style.backgroundColor = bgColor;
+    }
+
+    function changeBackgroundImage() {
+      var bgImageUrl = document.getElementById('backgroundImageUrl').value;
+      document.body.style.backgroundImage = 'url(' + bgImageUrl + ')';
+    }
+
+    function closeBackgroundSettings() {
+      var backgroundSettings = document.getElementById('backgroundSettings');
+      backgroundSettings.classList.remove('active');
+    }
+
+    function logout() {
+      console.log('ログアウトします');
+    }
+
+    function saveScheduleSettings() {
+      console.log('予定の設定を保存します');
+      var scheduleList = document.getElementById('scheduleItems');
+      scheduleList.innerHTML = ''; // クリア
+      var messages = [
+        { time: document.getElementById('wakeupTime').value, message: document.getElementById('wakeupMessage').value, event: '起床' },
+        { time: document.getElementById('breakfastTime').value, message: document.getElementById('breakfastMessage').value, event: '朝食' },
+        { time: document.getElementById('departureTime').value, message: document.getElementById('departureMessage').value, event: '出発' },
+        { time: document.getElementById('lunchTime').value, message: document.getElementById('lunchMessage').value, event: '昼食' },
+        { time: document.getElementById('studyTime').value, message: document.getElementById('studyMessage').value, event: '勉強' },
+        { time: document.getElementById('breakTime').value, message: document.getElementById('breakMessage').value, event: '休憩' },
+        { time: document.getElementById('dinnerTime').value, message: document.getElementById('dinnerMessage').value, event: '夕食' },
+        { time: document.getElementById('bedTime').value, message: document.getElementById('bedMessage').value, event: '就寝' },
+      ];
+      messages.forEach(item => {
+        if (item.time) {
+          var itemDiv = document.createElement('div');
+          itemDiv.innerText = item.event + ' (' + item.time + ')';
+          scheduleList.appendChild(itemDiv);
+        }
+      });
+    }
+
+    function closeScheduleSettings() {
+      var scheduleSettings = document.getElementById('scheduleSettings');
+      scheduleSettings.classList.remove('active');
+    }
+
+    function saveUserSettings() {
+      var userName = document.getElementById('userName').value;
+      var userNameDisplay = document.getElementById('userNameDisplay');
+      var nameColor = document.getElementById('nameColor').value;
+      var nameFont = document.getElementById('nameFont').value;
+
+      userNameDisplay.innerText = userName;
+      userNameDisplay.style.color = nameColor;
+      userNameDisplay.style.fontFamily = nameFont;
+
+      console.log('ユーザー設定を保存します');
+
+      var userSettings = document.getElementById('userSettings');
+      userSettings.classList.remove('active');
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+   function changeBackgroundColor() {
+      const bgColor = document.getElementById('backgroundColor').value;
+      document.body.style.backgroundColor = bgColor;
+
+      const titleElement = document.getElementById('title');
+      const clockElement = document.getElementById('clock');
+      const scheduleListElement = document.getElementById('scheduleList');
+      const userNameDisplay = document.getElementById('userNameDisplay');
+
+      // 黒字が見にくくなる色
+      const darkColors = ['black', 'purple', 'navy', 'gray','green', 'darkgreen', 'red', 'blue', 'brown'];
+
+      if (darkColors.includes(bgColor)) {
+        titleElement.style.color = 'white';
+        clockElement.style.color = 'white';
+        scheduleListElement.style.color = 'white'; // 予定一覧の色も白に
+      } else {
+        titleElement.style.color = 'black';
+        clockElement.style.color = 'black';
+        scheduleListElement.style.color = 'black'; // 背景が白の時は黒に
+      }
+    }
+
+    function changeNameColor() {
+      const nameColor = document.getElementById('nameColor').value;
+      document.getElementById('userNameDisplay').style.color = nameColor;
+    }
+    function getCurrentTime() {
+  var japanTimeZone = "Asia/Tokyo";
+  var japanTime = new Date().toLocaleString("ja-JP", {timeZone: japanTimeZone});
+  return japanTime;
+}
+
+function sendEmailNotification(email, message) {
+  MailApp.sendEmail({
+    to: email,
+    subject: '予定の通知',
+    body: message
+  });
+}
+
+function scheduleNotification(email, targetTime) {
+  var currentTime = new Date();
+  var notificationTime = new Date(currentTime);
+  notificationTime.setMinutes(notificationTime.getMinutes() + 5); // 5分後
+
+  if (targetTime === notificationTime.toLocaleTimeString("ja-JP", { hour12: false })) {
+    sendEmailNotification(email, '予定の時間が近づいています！');
+  }
+}
+  </script>
+</body>
+</html>
